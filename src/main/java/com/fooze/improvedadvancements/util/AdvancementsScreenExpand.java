@@ -16,7 +16,7 @@ public final class AdvancementsScreenExpand {
     private AdvancementsScreenExpand() {
     }
 
-    // Updates the advancement window size based on the screen size and the expand amount
+    // Expands the advancement window size based on the screen size and the expand amount
     public static void expand(int screenWidth, int screenHeight) {
         // Only update if expand is enabled
         if (!Config.EXPAND_SCREEN.get()) {

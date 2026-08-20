@@ -6,8 +6,7 @@
   "client": [
     "AdvancementsScreenMixin",
     "AdvancementTabMixin",
-    "AdvancementTabTypeMixin",
-    "AdvancementWidgetMixin"
+    "ScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1

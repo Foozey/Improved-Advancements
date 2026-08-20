@@ -51,7 +51,7 @@ abstract class AdvancementsScreenMixin extends Screen {
 
     // Sorts the advancement tabs and expands the advancement window
     @Inject(method = "init", at = @At("HEAD"))
-    private void improvedadvancements$sortTabs(CallbackInfo callbackInfo) {
+    private void improvedadvancements$init(CallbackInfo callbackInfo) {
         AdvancementsScreenSort.sort(this.advancements.getTree().roots());
         AdvancementsScreenExpand.expand(this.width, this.height);
     }
