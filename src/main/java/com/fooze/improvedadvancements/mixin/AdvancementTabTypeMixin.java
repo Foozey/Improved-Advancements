@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(targets = "net.minecraft.client.gui.screens.advancements.AdvancementTabType")
 abstract class AdvancementTabTypeMixin {
+    // Gives access to the tab capacity
     @Shadow @Final @Mutable
     private int max;
 
@@ -20,10 +21,28 @@ abstract class AdvancementTabTypeMixin {
     @Inject(method = "getMax", at = @At("HEAD"), cancellable = true)
     private void improvedadvancements$tabCapacity(CallbackInfoReturnable<Integer> callbackInfo) {
         String tabType = ((Enum<?>) (Object) this).name();
-        int capacity = improvedadvancements$tabCapacity(tabType);
 
-        // Only use the edge tab texture if a tab reaches the edge of the window
-        if (improvedadvancements$reachesWindowEdge(tabType, capacity)) {
+        // Above and below tabs use horizontal spacing, left and right use vertical spacing
+        boolean horizontal = switch (tabType) {
+            case "ABOVE", "BELOW" -> true;
+            case "LEFT", "RIGHT" -> false;
+            default -> throw new IllegalArgumentException("Unknown advancement tab type: " + tabType);
+        };
+
+        int capacity;
+        boolean reachesEdge;
+
+        // Calculate the capacity and whether its final tab reaches the edge
+        if (horizontal) {
+            capacity = AdvancementsScreenExpand.horizontalTabCapacity();
+            reachesEdge = (capacity - 1) * 32 + 28 == AdvancementsScreenExpand.windowWidth();
+        } else {
+            capacity = AdvancementsScreenExpand.verticalTabCapacity();
+            reachesEdge = capacity * 28 == AdvancementsScreenExpand.windowHeight();
+        }
+
+        // Only use the edge texture when the final tab reaches the edge
+        if (reachesEdge) {
             this.max = capacity;
         } else {
             this.max = Integer.MAX_VALUE;
@@ -42,23 +61,5 @@ abstract class AdvancementTabTypeMixin {
     @ModifyConstant(method = "getY", constant = @Constant(intValue = 136))
     private int improvedadvancements$bottomTabY(int original) {
         return AdvancementsScreenExpand.windowHeight() - 4;
-    }
-
-    // Returns how many tabs fit an edge
-    private static int improvedadvancements$tabCapacity(String tabType) {
-        return switch (tabType) {
-            case "ABOVE", "BELOW" -> AdvancementsScreenExpand.horizontalTabCapacity();
-            case "LEFT", "RIGHT" -> AdvancementsScreenExpand.verticalTabCapacity();
-            default -> throw new IllegalArgumentException("Unknown advancement tab type: " + tabType);
-        };
-    }
-
-    // Returns whether the final tab on an edge reaches the window edge
-    private static boolean improvedadvancements$reachesWindowEdge(String tabType, int capacity) {
-        return switch (tabType) {
-            case "ABOVE", "BELOW" -> (capacity - 1) * 32 + 28 == AdvancementsScreenExpand.windowWidth();
-            case "LEFT", "RIGHT" -> capacity * 28 == AdvancementsScreenExpand.windowHeight();
-            default -> throw new IllegalArgumentException("Unknown advancement tab type: " + tabType);
-        };
     }
 }
