@@ -1,0 +1,11 @@
+{
+  "improvedadvancements.configuration.title": "Improved Advancements Configuration",
+  "improvedadvancements.configuration.section.improvedadvancements.client.toml": "Improved Advancements Configuration",
+  "improvedadvancements.configuration.section.improvedadvancements.client.toml.title": "Improved Advancements Configuration",
+  "improvedadvancements.configuration.enableSorting": "Enable Sorting",
+  "improvedadvancements.configuration.enableSorting.tooltip": "Whether to enable sorting of advancement tabs",
+  "improvedadvancements.configuration.expandScreen": "Expand Screen",
+  "improvedadvancements.configuration.expandScreen.tooltip": "Whether to expand the advancement screen to fill more space",
+  "improvedadvancements.configuration.expandAmount": "Expand Amount",
+  "improvedadvancements.configuration.expandAmount.tooltip": "The percentage of screen space for the advancement screen to expand to"
+}

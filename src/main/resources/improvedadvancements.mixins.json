@@ -1,0 +1,18 @@
+{
+  "required": true,
+  "package": "com.fooze.improvedadvancements.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [],
+  "client": [
+    "AdvancementsScreenMixin",
+    "AdvancementTabMixin",
+    "AdvancementTabTypeMixin",
+    "AdvancementWidgetMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
+}
