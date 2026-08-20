@@ -108,9 +108,12 @@ abstract class AdvancementsScreenMixin extends Screen {
             return;
         }
 
-        // Stop the vanilla window from rendering, enable blending, and render the expanded window
+        // Stop the vanilla window from rendering and enable blending
         callbackInfo.cancel();
         RenderSystem.enableBlend();
+
+        // Draw the window shadow and window frame
+        improvedadvancements$drawWindowShadow(guiGraphics, offsetX, offsetY);
         improvedadvancements$drawWindowFrame(guiGraphics, offsetX, offsetY);
 
         // Draw the tabs if there's more than one
@@ -132,6 +135,23 @@ abstract class AdvancementsScreenMixin extends Screen {
                 4210752,
                 false
         );
+    }
+
+    // Draws the expanded advancement window shadow
+    private static void improvedadvancements$drawWindowShadow(GuiGraphics graphics, int x, int y) {
+        int insideWidth = AdvancementsScreenExpand.insideWidth();
+        int insideHeight = AdvancementsScreenExpand.insideHeight();
+        int rightX = x + AdvancementsScreenExpand.HORIZONTAL_BORDER + insideWidth;
+        int bottomY = y + AdvancementsScreenExpand.HEADER_HEIGHT + insideHeight;
+
+        improvedadvancements$blit(graphics, x + 9, y + 18, 6, 5, 9, 18, 6, 5);
+        improvedadvancements$blit(graphics, x + 15, y + 18, insideWidth - 12, 5, 15, 18, 222, 5);
+        improvedadvancements$blit(graphics, rightX - 6, y + 18, 6, 5, 237, 18, 6, 5);
+        improvedadvancements$blit(graphics, x + 9, y + 23, 6, insideHeight - 11, 9, 23, 6, 102);
+        improvedadvancements$blit(graphics, rightX - 6, y + 23, 6, insideHeight - 11, 237, 23, 6, 102);
+        improvedadvancements$blit(graphics, x + 9, bottomY - 6, 6, 6, 9, 125, 6, 6);
+        improvedadvancements$blit(graphics, x + 15, bottomY - 6, insideWidth - 12, 6, 15, 125, 222, 6);
+        improvedadvancements$blit(graphics, rightX - 6, bottomY - 6, 6, 6, 237, 125, 6, 6);
     }
 
     // Draws the expanded advancement window frame
