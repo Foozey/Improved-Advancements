@@ -9,6 +9,8 @@ public final class AdvancementsScreenExpand {
     public static final int HORIZONTAL_BORDER = 9;
     public static final int BOTTOM_BORDER = 9;
     public static final int MARGIN = 128;
+    private static final int HORIZONTAL_TAB_STEP = 32;
+    private static final int VERTICAL_TAB_STEP = 28;
 
     private static int windowWidth = VANILLA_WINDOW_WIDTH;
     private static int windowHeight = VANILLA_WINDOW_HEIGHT;
@@ -64,5 +66,20 @@ public final class AdvancementsScreenExpand {
     // Returns whether the advancement window is expanded
     public static boolean isExpanded() {
         return windowWidth != VANILLA_WINDOW_WIDTH || windowHeight != VANILLA_WINDOW_HEIGHT;
+    }
+
+    // Returns how many tabs fit horizontally
+    public static int horizontalTabCapacity() {
+        return (windowWidth + 4) / HORIZONTAL_TAB_STEP;
+    }
+
+    // Returns how many tabs fit vertically
+    public static int verticalTabCapacity() {
+        return windowHeight / VERTICAL_TAB_STEP;
+    }
+
+    // Returns how many tabs fit per page
+    public static int tabsPerPage() {
+        return 2 * (horizontalTabCapacity() + verticalTabCapacity());
     }
 }

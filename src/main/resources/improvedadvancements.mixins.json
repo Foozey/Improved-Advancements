@@ -6,6 +6,7 @@
   "client": [
     "AdvancementsScreenMixin",
     "AdvancementTabMixin",
+    "AdvancementTabTypeMixin",
     "ScreenMixin"
   ],
   "injectors": {

@@ -6,10 +6,7 @@ import net.minecraft.client.gui.screens.advancements.AdvancementTab;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Constant;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyConstant;
+import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(AdvancementTab.class)
@@ -25,6 +22,15 @@ abstract class AdvancementTabMixin {
     // Stores the last inside height
     @Unique
     private int improvedadvancements$lastInsideHeight = -1;
+
+    // Replaces Minecraft's fixed tabs per page with the expanded capacity
+    @Redirect(method = "create", at = @At(
+            value = "FIELD",
+            target = "Lnet/minecraft/client/gui/screens/advancements/AdvancementTabType;MAX_TABS:I"
+    ))
+    private static int improvedadvancements$tabsPerPage() {
+        return AdvancementsScreenExpand.tabsPerPage();
+    }
 
     // Re-centers advancements when the window size changes
     @Inject(method = "drawContents", at = @At("HEAD"))

@@ -14,10 +14,7 @@ import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Constant;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyConstant;
+import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import javax.annotation.Nullable;
@@ -44,6 +41,15 @@ abstract class AdvancementsScreenMixin extends Screen {
     // Gives access to the tab page number
     @Shadow
     private static int tabPage;
+
+    // Syncs the page controls with the expanded tab layout
+    @Redirect(method = "init", at = @At(
+            value = "FIELD",
+            target = "Lnet/minecraft/client/gui/screens/advancements/AdvancementTabType;MAX_TABS:I"
+    ))
+    private static int improvedadvancements$tabsPerPage() {
+        return AdvancementsScreenExpand.tabsPerPage();
+    }
 
     protected AdvancementsScreenMixin(Component title) {
         super(title);
