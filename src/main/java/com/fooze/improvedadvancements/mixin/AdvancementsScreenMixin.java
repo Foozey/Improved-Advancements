@@ -1,7 +1,7 @@
 package com.fooze.improvedadvancements.mixin;
 
-import com.fooze.improvedadvancements.util.AdvancementsScreenExpand;
-import com.fooze.improvedadvancements.util.AdvancementsScreenSort;
+import com.fooze.improvedadvancements.feature.ExpandScreen;
+import com.fooze.improvedadvancements.feature.SortTabs;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.client.gui.GuiGraphics;
@@ -26,21 +26,10 @@ abstract class AdvancementsScreenMixin extends Screen {
     private static final ResourceLocation IMPROVED_ADVANCEMENTS$WINDOW =
             ResourceLocation.withDefaultNamespace("textures/gui/advancements/window.png");
 
-    // Gives access to the advancements
-    @Shadow @Final
-    private ClientAdvancements advancements;
-
-    // Gives access to the tabs
-    @Shadow @Final
-    private Map<AdvancementHolder, AdvancementTab> tabs;
-
-    // Gives access to the selected tab
-    @Shadow @Nullable
-    private AdvancementTab selectedTab;
-
-    // Gives access to the tab page number
-    @Shadow
-    private static int tabPage;
+    @Shadow @Final private ClientAdvancements advancements;
+    @Shadow @Final private Map<AdvancementHolder, AdvancementTab> tabs;
+    @Shadow @Nullable private AdvancementTab selectedTab;
+    @Shadow private static int tabPage;
 
     // Syncs the page controls with the expanded tab layout
     @Redirect(method = "init", at = @At(
@@ -48,7 +37,7 @@ abstract class AdvancementsScreenMixin extends Screen {
             target = "Lnet/minecraft/client/gui/screens/advancements/AdvancementTabType;MAX_TABS:I"
     ))
     private static int improvedadvancements$tabsPerPage() {
-        return AdvancementsScreenExpand.tabsPerPage();
+        return ExpandScreen.tabsPerPage();
     }
 
     protected AdvancementsScreenMixin(Component title) {
@@ -58,50 +47,50 @@ abstract class AdvancementsScreenMixin extends Screen {
     // Sorts the advancement tabs and expands the advancement window
     @Inject(method = "init", at = @At("HEAD"))
     private void improvedadvancements$init(CallbackInfo callbackInfo) {
-        AdvancementsScreenSort.sort(this.advancements.getTree().roots());
-        AdvancementsScreenExpand.expand(this.width, this.height);
+        SortTabs.sort(this.advancements.getTree().roots());
+        ExpandScreen.expand(this.width, this.height);
     }
 
     // Replaces the window width with the expanded value
     @ModifyConstant(method = {"init", "mouseClicked", "render"}, constant = @Constant(intValue = 252))
     private int improvedadvancements$windowWidth(int original) {
-        return AdvancementsScreenExpand.windowWidth();
+        return ExpandScreen.windowWidth();
     }
 
     // Replaces the window height with the expanded value
     @ModifyConstant(method = {"init", "mouseClicked", "render"}, constant = @Constant(intValue = 140))
     private int improvedadvancements$windowHeight(int original) {
-        return AdvancementsScreenExpand.windowHeight();
+        return ExpandScreen.windowHeight();
     }
 
     // Replaces the horizontal center with the expanded value
     @ModifyConstant(method = "render", constant = @Constant(intValue = 126))
     private int improvedadvancements$windowCenter(int original) {
-        return AdvancementsScreenExpand.windowWidth() / 2;
+        return ExpandScreen.windowWidth() / 2;
     }
 
     // Replaces the inside width with the expanded value
     @ModifyConstant(method = "renderInside", constant = @Constant(intValue = 234))
     private int improvedadvancements$insideWidth(int original) {
-        return AdvancementsScreenExpand.insideWidth();
+        return ExpandScreen.insideWidth();
     }
 
     // Replaces the inside height with the expanded value
     @ModifyConstant(method = "renderInside", constant = @Constant(intValue = 113))
     private int improvedadvancements$insideHeight(int original) {
-        return AdvancementsScreenExpand.insideHeight();
+        return ExpandScreen.insideHeight();
     }
 
     // Replaces the inside horizontal center with the expanded value
     @ModifyConstant(method = "renderInside", constant = @Constant(intValue = 117))
     private int improvedadvancements$insideCenterX(int original) {
-        return AdvancementsScreenExpand.insideWidth() / 2;
+        return ExpandScreen.insideWidth() / 2;
     }
 
     // Replaces the inside vertical center with the expanded value
     @ModifyConstant(method = "renderInside", constant = @Constant(intValue = 56))
     private int improvedadvancements$insideCenterY(int original) {
-        return AdvancementsScreenExpand.insideHeight() / 2;
+        return ExpandScreen.insideHeight() / 2;
     }
 
     // Renders the expanded advancements window
@@ -110,7 +99,7 @@ abstract class AdvancementsScreenMixin extends Screen {
             GuiGraphics guiGraphics, int offsetX, int offsetY, CallbackInfo callbackInfo
     ) {
         // Only render the expanded window if it's expanded
-        if (!AdvancementsScreenExpand.isExpanded()) {
+        if (!ExpandScreen.isExpanded()) {
             return;
         }
 
@@ -145,10 +134,10 @@ abstract class AdvancementsScreenMixin extends Screen {
 
     // Draws the expanded advancement window shadow
     private static void improvedadvancements$drawWindowShadow(GuiGraphics graphics, int x, int y) {
-        int insideWidth = AdvancementsScreenExpand.insideWidth();
-        int insideHeight = AdvancementsScreenExpand.insideHeight();
-        int rightX = x + AdvancementsScreenExpand.HORIZONTAL_BORDER + insideWidth;
-        int bottomY = y + AdvancementsScreenExpand.HEADER_HEIGHT + insideHeight;
+        int insideWidth = ExpandScreen.insideWidth();
+        int insideHeight = ExpandScreen.insideHeight();
+        int rightX = x + ExpandScreen.HORIZONTAL_BORDER + insideWidth;
+        int bottomY = y + ExpandScreen.HEADER_HEIGHT + insideHeight;
 
         improvedadvancements$blit(graphics, x + 9, y + 18, 6, 5, 9, 18, 6, 5);
         improvedadvancements$blit(graphics, x + 15, y + 18, insideWidth - 12, 5, 15, 18, 222, 5);
@@ -162,10 +151,10 @@ abstract class AdvancementsScreenMixin extends Screen {
 
     // Draws the expanded advancement window frame
     private static void improvedadvancements$drawWindowFrame(GuiGraphics graphics, int x, int y) {
-        int insideWidth = AdvancementsScreenExpand.insideWidth();
-        int insideHeight = AdvancementsScreenExpand.insideHeight();
-        int rightX = x + AdvancementsScreenExpand.HORIZONTAL_BORDER + insideWidth;
-        int bottomY = y + AdvancementsScreenExpand.HEADER_HEIGHT + insideHeight;
+        int insideWidth = ExpandScreen.insideWidth();
+        int insideHeight = ExpandScreen.insideHeight();
+        int rightX = x + ExpandScreen.HORIZONTAL_BORDER + insideWidth;
+        int bottomY = y + ExpandScreen.HEADER_HEIGHT + insideHeight;
 
         improvedadvancements$blit(graphics, x, y, 9, 18, 0, 0, 9, 18);
         improvedadvancements$blit(graphics, x + 9, y, insideWidth, 18, 9, 0, 234, 18);

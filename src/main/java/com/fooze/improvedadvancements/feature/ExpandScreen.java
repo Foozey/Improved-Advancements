@@ -1,8 +1,8 @@
-package com.fooze.improvedadvancements.util;
+package com.fooze.improvedadvancements.feature;
 
 import com.fooze.improvedadvancements.Config;
 
-public final class AdvancementsScreenExpand {
+public final class ExpandScreen {
     public static final int VANILLA_WINDOW_WIDTH = 252;
     public static final int VANILLA_WINDOW_HEIGHT = 140;
     public static final int HEADER_HEIGHT = 18;
@@ -15,12 +15,11 @@ public final class AdvancementsScreenExpand {
     private static int windowWidth = VANILLA_WINDOW_WIDTH;
     private static int windowHeight = VANILLA_WINDOW_HEIGHT;
 
-    private AdvancementsScreenExpand() {
-    }
+    private ExpandScreen() {}
 
     // Expands the advancement window size based on the screen size and the expand amount
     public static void expand(int screenWidth, int screenHeight) {
-        // Only update if expand is enabled
+        // Only expand if the config option is enabled
         if (!Config.EXPAND_SCREEN.get()) {
             windowWidth = VANILLA_WINDOW_WIDTH;
             windowHeight = VANILLA_WINDOW_HEIGHT;

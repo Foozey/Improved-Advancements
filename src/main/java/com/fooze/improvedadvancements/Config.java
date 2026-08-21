@@ -17,5 +17,9 @@ public class Config {
             .comment("The percentage of screen space for the advancement screen to expand to")
             .defineInRange("expandAmount", 100, 0, 100);
 
+    public static final ModConfigSpec.BooleanValue SHOW_CRITERIA = BUILDER
+            .comment("Whether to show the advancement criteria progress in the tooltip")
+            .define("showCriteria", true);
+
     static final ModConfigSpec SPEC = BUILDER.build();
 }

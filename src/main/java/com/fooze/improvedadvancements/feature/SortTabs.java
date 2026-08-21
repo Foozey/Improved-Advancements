@@ -1,4 +1,4 @@
-package com.fooze.improvedadvancements.util;
+package com.fooze.improvedadvancements.feature;
 
 import com.fooze.improvedadvancements.Config;
 import net.minecraft.advancements.AdvancementNode;
@@ -8,7 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 
 import java.util.*;
 
-public class AdvancementsScreenSort {
+public class SortTabs {
     // Vanilla tab order
     private static final Map<ResourceLocation, Integer> VANILLA_TAB_ORDER = Map.of(
             ResourceLocation.withDefaultNamespace("story/root"), 0,
@@ -20,14 +20,14 @@ public class AdvancementsScreenSort {
 
     // Comparator for sorting advancement tabs by vanilla tab order, then name, then ID
     private static final Comparator<AdvancementNode> TAB_COMPARATOR = Comparator
-            .comparingInt(AdvancementsScreenSort::vanillaOrder)
-            .thenComparing(AdvancementsScreenSort::tabName, String.CASE_INSENSITIVE_ORDER)
-            .thenComparing(AdvancementsScreenSort::tabName)
+            .comparingInt(SortTabs::vanillaOrder)
+            .thenComparing(SortTabs::tabName, String.CASE_INSENSITIVE_ORDER)
+            .thenComparing(SortTabs::tabName)
             .thenComparing(node -> node.holder().id().toString());
 
     // Sorts the advancement tabs in ascending alphabetical order
     public static void sort(Iterable<AdvancementNode> roots) {
-        // Only sort if sorting is enabled and the roots are in a set
+        // Only sort if the config option is enabled and the roots are in a set
         if (!Config.ENABLE_SORTING.get() || !(roots instanceof Set<?>)) {
             return;
         }

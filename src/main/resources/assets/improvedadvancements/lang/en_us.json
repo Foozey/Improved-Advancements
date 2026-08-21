@@ -7,5 +7,7 @@
   "improvedadvancements.configuration.expandScreen": "Expand Screen",
   "improvedadvancements.configuration.expandScreen.tooltip": "Whether to expand the advancement screen to fill more space",
   "improvedadvancements.configuration.expandAmount": "Expand Amount",
-  "improvedadvancements.configuration.expandAmount.tooltip": "The percentage of screen space for the advancement screen to expand to"
+  "improvedadvancements.configuration.expandAmount.tooltip": "The percentage of screen space for the advancement screen to expand to",
+  "improvedadvancements.configuration.showCriteria": "Show Criteria",
+  "improvedadvancements.configuration.showCriteria.tooltip": "Whether to show the advancement criteria progress in the tooltip"
 }

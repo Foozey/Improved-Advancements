@@ -1,6 +1,6 @@
 package com.fooze.improvedadvancements.mixin;
 
-import com.fooze.improvedadvancements.util.AdvancementsScreenExpand;
+import com.fooze.improvedadvancements.feature.ExpandScreen;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
@@ -13,9 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(targets = "net.minecraft.client.gui.screens.advancements.AdvancementTabType")
 abstract class AdvancementTabTypeMixin {
-    // Gives access to the tab capacity
-    @Shadow @Final @Mutable
-    private int max;
+    @Shadow @Final @Mutable private int max;
 
     // Replaces the tab capacity with the expanded value
     @Inject(method = "getMax", at = @At("HEAD"), cancellable = true)
@@ -34,11 +32,11 @@ abstract class AdvancementTabTypeMixin {
 
         // Calculate the capacity and whether its final tab reaches the edge
         if (horizontal) {
-            capacity = AdvancementsScreenExpand.horizontalTabCapacity();
-            reachesEdge = (capacity - 1) * 32 + 28 == AdvancementsScreenExpand.windowWidth();
+            capacity = ExpandScreen.horizontalTabCapacity();
+            reachesEdge = (capacity - 1) * 32 + 28 == ExpandScreen.windowWidth();
         } else {
-            capacity = AdvancementsScreenExpand.verticalTabCapacity();
-            reachesEdge = capacity * 28 == AdvancementsScreenExpand.windowHeight();
+            capacity = ExpandScreen.verticalTabCapacity();
+            reachesEdge = capacity * 28 == ExpandScreen.windowHeight();
         }
 
         // Only use the edge texture when the final tab reaches the edge
@@ -54,12 +52,12 @@ abstract class AdvancementTabTypeMixin {
     // Moves right tabs to the expanded edge
     @ModifyConstant(method = "getX", constant = @Constant(intValue = 248))
     private int improvedadvancements$rightTabX(int original) {
-        return AdvancementsScreenExpand.windowWidth() - 4;
+        return ExpandScreen.windowWidth() - 4;
     }
 
     // Moves bottom tabs to the expanded edge
     @ModifyConstant(method = "getY", constant = @Constant(intValue = 136))
     private int improvedadvancements$bottomTabY(int original) {
-        return AdvancementsScreenExpand.windowHeight() - 4;
+        return ExpandScreen.windowHeight() - 4;
     }
 }
