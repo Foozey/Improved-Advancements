@@ -3,6 +3,7 @@ package com.fooze.improvedadvancements.mixin;
 import com.fooze.improvedadvancements.feature.ExpandScreen;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.advancements.AdvancementTab;
+import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -12,10 +13,27 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(AdvancementTab.class)
 abstract class AdvancementTabMixin {
     @Shadow private boolean centered;
-    @Unique private int improvedadvancements$lastInsideWidth = -1;
-    @Unique private int improvedadvancements$lastInsideHeight = -1;
+    @Unique private int improvedadvancements$previousWidth = -1;
+    @Unique private int improvedadvancements$previousHeight = -1;
 
-    // Replaces Minecraft's fixed tabs per page with the expanded capacity
+    // Replaces the tiled background loop with one repeated texture
+    @Redirect(method = "drawContents", at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/gui/GuiGraphics;blit(Lnet/minecraft/resources/ResourceLocation;IIFFIIII)V"
+    ))
+    private void improvedadvancements$drawBackground(
+            GuiGraphics guiGraphics, ResourceLocation texture, int x, int y,
+            float textureX, float textureY, int width, int height,
+            int textureWidth, int textureHeight
+    ) {
+        guiGraphics.blit(
+                texture, x, y, textureX, textureY,
+                ExpandScreen.insideWidth() + 32, ExpandScreen.insideHeight() + 32,
+                textureWidth, textureHeight
+        );
+    }
+
+    // Replaces the maximum tabs per page with the expanded capacity
     @Redirect(method = "create", at = @At(
             value = "FIELD",
             target = "Lnet/minecraft/client/gui/screens/advancements/AdvancementTabType;MAX_TABS:I"
@@ -29,18 +47,12 @@ abstract class AdvancementTabMixin {
     private void improvedadvancements$refreshLayout(
             GuiGraphics guiGraphics, int x, int y, CallbackInfo callbackInfo
     ) {
-        int insideWidth = ExpandScreen.insideWidth();
-        int insideHeight = ExpandScreen.insideHeight();
-
-        // Check whether the available advancement area changed
-        if (insideWidth != this.improvedadvancements$lastInsideWidth
-                || insideHeight != this.improvedadvancements$lastInsideHeight) {
-
-            // Remember the new dimensions
-            this.improvedadvancements$lastInsideWidth = insideWidth;
-            this.improvedadvancements$lastInsideHeight = insideHeight;
-
-            // Recalculate the centering
+        if (ExpandScreen.sizeChanged(
+                this.improvedadvancements$previousWidth,
+                this.improvedadvancements$previousHeight
+        )) {
+            this.improvedadvancements$previousWidth = ExpandScreen.insideWidth();
+            this.improvedadvancements$previousHeight = ExpandScreen.insideHeight();
             this.centered = false;
         }
     }
@@ -67,17 +79,5 @@ abstract class AdvancementTabMixin {
     @ModifyConstant(method = "drawContents", constant = @Constant(intValue = 56))
     private int improvedadvancements$insideCenterY(int original) {
         return ExpandScreen.insideHeight() / 2;
-    }
-
-    // Replaces the number of background columns with the expanded value
-    @ModifyConstant(method = "drawContents", constant = @Constant(intValue = 15))
-    private int improvedadvancements$backgroundColumns(int original) {
-        return ExpandScreen.insideWidth() / 16 + 1;
-    }
-
-    // Replaces the number of background rows with the expanded value
-    @ModifyConstant(method = "drawContents", constant = @Constant(intValue = 8))
-    private int improvedadvancements$backgroundRows(int original) {
-        return ExpandScreen.insideHeight() / 16 + 1;
     }
 }

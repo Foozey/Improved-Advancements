@@ -17,7 +17,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import javax.annotation.Nullable;
-import java.util.List;
 
 @Mixin(AdvancementWidget.class)
 abstract class AdvancementWidgetMixin {
@@ -35,38 +34,18 @@ abstract class AdvancementWidgetMixin {
     @Inject(method = "drawHover", at = @At("HEAD"), cancellable = true)
     private void improvedadvancements$drawProgressCriteria(
             GuiGraphics guiGraphics,
-            int x,
-            int y,
-            float fade,
-            int screenOffsetX,
-            int screenOffsetY,
+            int x, int y, float fade, int screenOffsetX, int screenOffsetY,
             CallbackInfo callbackInfo
     ) {
-        List<FormattedCharSequence> criteria = CriteriaTooltip.criteriaList(
-                this.advancementNode,
-                this.progress,
-                this.minecraft
-        );
-
         callbackInfo.cancel();
 
         // Render the tooltip with criteria
         CriteriaTooltip.render(
-                guiGraphics,
-                this.tab,
-                this.advancementNode,
-                this.display,
-                this.title,
-                this.width,
-                this.minecraft,
-                this.progress,
-                this.x,
-                this.y,
-                x,
-                y,
-                screenOffsetX,
-                screenOffsetY,
-                criteria
+                guiGraphics, this.tab, this.advancementNode,
+                this.display, this.title, this.width,
+                this.minecraft, this.progress,
+                this.x, this.y, x, y, screenOffsetX, screenOffsetY,
+                CriteriaTooltip.criteriaList(this.advancementNode, this.progress)
         );
     }
 }

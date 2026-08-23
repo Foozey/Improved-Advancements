@@ -47,9 +47,6 @@ public class SortTabs {
 
     // Returns the name of the advancement tab
     private static String tabName(AdvancementNode node) {
-        return node.advancement().display()
-                .map(DisplayInfo::getTitle)
-                .map(Component::getString)
-                .orElse("");
+        return node.advancement().display().map(DisplayInfo::getTitle).map(Component::getString).orElse("");
     }
 }

@@ -2,7 +2,6 @@ package com.fooze.improvedadvancements.mixin;
 
 import com.fooze.improvedadvancements.feature.ExpandScreen;
 import com.fooze.improvedadvancements.feature.SortTabs;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
@@ -10,7 +9,6 @@ import net.minecraft.client.gui.screens.advancements.AdvancementTab;
 import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
 import net.minecraft.client.multiplayer.ClientAdvancements;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -22,10 +20,6 @@ import java.util.Map;
 
 @Mixin(AdvancementsScreen.class)
 abstract class AdvancementsScreenMixin extends Screen {
-    // Texture used for the expanded advancements window
-    private static final ResourceLocation IMPROVED_ADVANCEMENTS$WINDOW =
-            ResourceLocation.withDefaultNamespace("textures/gui/advancements/window.png");
-
     @Shadow @Final private ClientAdvancements advancements;
     @Shadow @Final private Map<AdvancementHolder, AdvancementTab> tabs;
     @Shadow @Nullable private AdvancementTab selectedTab;
@@ -42,6 +36,20 @@ abstract class AdvancementsScreenMixin extends Screen {
 
     protected AdvancementsScreenMixin(Component title) {
         super(title);
+    }
+
+    // Renders the expanded advancements window
+    @Inject(method = "renderWindow", at = @At("HEAD"), cancellable = true)
+    private void improvedadvancements$renderExpandedWindow(
+            GuiGraphics guiGraphics, int offsetX, int offsetY, CallbackInfo callbackInfo
+    ) {
+        if (ExpandScreen.render(
+                guiGraphics, offsetX, offsetY,
+                this.tabs, tabPage, this.selectedTab,
+                this.font, this.title
+        )) {
+            callbackInfo.cancel();
+        }
     }
 
     // Sorts the advancement tabs and expands the advancement window
@@ -63,7 +71,7 @@ abstract class AdvancementsScreenMixin extends Screen {
         return ExpandScreen.windowHeight();
     }
 
-    // Replaces the horizontal center with the expanded value
+    // Replaces the window center with the expanded value
     @ModifyConstant(method = "render", constant = @Constant(intValue = 126))
     private int improvedadvancements$windowCenter(int original) {
         return ExpandScreen.windowWidth() / 2;
@@ -91,91 +99,5 @@ abstract class AdvancementsScreenMixin extends Screen {
     @ModifyConstant(method = "renderInside", constant = @Constant(intValue = 56))
     private int improvedadvancements$insideCenterY(int original) {
         return ExpandScreen.insideHeight() / 2;
-    }
-
-    // Renders the expanded advancements window
-    @Inject(method = "renderWindow", at = @At("HEAD"), cancellable = true)
-    private void improvedadvancements$renderExpandedWindow(
-            GuiGraphics guiGraphics, int offsetX, int offsetY, CallbackInfo callbackInfo
-    ) {
-        // Only render the expanded window if it's expanded
-        if (!ExpandScreen.isExpanded()) {
-            return;
-        }
-
-        // Stop the vanilla window from rendering and enable blending
-        callbackInfo.cancel();
-        RenderSystem.enableBlend();
-
-        // Draw the window shadow and window frame
-        improvedadvancements$drawWindowShadow(guiGraphics, offsetX, offsetY);
-        improvedadvancements$drawWindowFrame(guiGraphics, offsetX, offsetY);
-
-        // Draw the tabs if there's more than one
-        if (this.tabs.size() > 1) {
-            for (AdvancementTab tab : this.tabs.values()) {
-                if (tab.getPage() == tabPage) {
-                    tab.drawTab(guiGraphics, offsetX, offsetY, tab == this.selectedTab);
-                    tab.drawIcon(guiGraphics, offsetX, offsetY);
-                }
-            }
-        }
-
-        // Draw the title of the selected tab, otherwise use the screen title
-        guiGraphics.drawString(
-                this.font,
-                this.selectedTab != null ? this.selectedTab.getTitle() : this.title,
-                offsetX + 8,
-                offsetY + 6,
-                4210752,
-                false
-        );
-    }
-
-    // Draws the expanded advancement window shadow
-    private static void improvedadvancements$drawWindowShadow(GuiGraphics graphics, int x, int y) {
-        int insideWidth = ExpandScreen.insideWidth();
-        int insideHeight = ExpandScreen.insideHeight();
-        int rightX = x + ExpandScreen.HORIZONTAL_BORDER + insideWidth;
-        int bottomY = y + ExpandScreen.HEADER_HEIGHT + insideHeight;
-
-        improvedadvancements$blit(graphics, x + 9, y + 18, 6, 5, 9, 18, 6, 5);
-        improvedadvancements$blit(graphics, x + 15, y + 18, insideWidth - 12, 5, 15, 18, 222, 5);
-        improvedadvancements$blit(graphics, rightX - 6, y + 18, 6, 5, 237, 18, 6, 5);
-        improvedadvancements$blit(graphics, x + 9, y + 23, 6, insideHeight - 11, 9, 23, 6, 102);
-        improvedadvancements$blit(graphics, rightX - 6, y + 23, 6, insideHeight - 11, 237, 23, 6, 102);
-        improvedadvancements$blit(graphics, x + 9, bottomY - 6, 6, 6, 9, 125, 6, 6);
-        improvedadvancements$blit(graphics, x + 15, bottomY - 6, insideWidth - 12, 6, 15, 125, 222, 6);
-        improvedadvancements$blit(graphics, rightX - 6, bottomY - 6, 6, 6, 237, 125, 6, 6);
-    }
-
-    // Draws the expanded advancement window frame
-    private static void improvedadvancements$drawWindowFrame(GuiGraphics graphics, int x, int y) {
-        int insideWidth = ExpandScreen.insideWidth();
-        int insideHeight = ExpandScreen.insideHeight();
-        int rightX = x + ExpandScreen.HORIZONTAL_BORDER + insideWidth;
-        int bottomY = y + ExpandScreen.HEADER_HEIGHT + insideHeight;
-
-        improvedadvancements$blit(graphics, x, y, 9, 18, 0, 0, 9, 18);
-        improvedadvancements$blit(graphics, x + 9, y, insideWidth, 18, 9, 0, 234, 18);
-        improvedadvancements$blit(graphics, rightX, y, 9, 18, 243, 0, 9, 18);
-        improvedadvancements$blit(graphics, x, y + 18, 9, insideHeight, 0, 18, 9, 113);
-        improvedadvancements$blit(graphics, rightX, y + 18, 9, insideHeight, 243, 18, 9, 113);
-        improvedadvancements$blit(graphics, x, bottomY, 9, 9, 0, 131, 9, 9);
-        improvedadvancements$blit(graphics, x + 9, bottomY, insideWidth, 9, 9, 131, 234, 9);
-        improvedadvancements$blit(graphics, rightX, bottomY, 9, 9, 243, 131, 9, 9);
-    }
-
-    // Helper method for drawing a section of the expanded advancement window
-    private static void improvedadvancements$blit(
-            GuiGraphics graphics, int x, int y, int width, int height,
-            int textureX, int textureY, int textureWidth, int textureHeight
-    ) {
-        graphics.blit(
-                IMPROVED_ADVANCEMENTS$WINDOW,
-                x, y, width, height,
-                textureX, textureY, textureWidth, textureHeight,
-                256, 256
-        );
     }
 }
