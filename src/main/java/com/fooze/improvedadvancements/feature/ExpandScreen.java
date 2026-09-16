@@ -12,7 +12,7 @@ import net.minecraft.resources.ResourceLocation;
 import javax.annotation.Nullable;
 import java.util.Map;
 
-public final class ExpandScreen {
+public class ExpandScreen {
     public static final int VANILLA_WINDOW_WIDTH = 252;
     public static final int VANILLA_WINDOW_HEIGHT = 140;
     public static final int HEADER_HEIGHT = 18;
@@ -27,8 +27,6 @@ public final class ExpandScreen {
 
     private static int windowWidth = VANILLA_WINDOW_WIDTH;
     private static int windowHeight = VANILLA_WINDOW_HEIGHT;
-
-    private ExpandScreen() {}
 
     // Expands the advancement window size based on the screen size and the expand amount
     public static void expand(int screenWidth, int screenHeight) {

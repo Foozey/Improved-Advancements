@@ -13,6 +13,7 @@ import net.minecraft.client.gui.screens.advancements.AdvancementTab;
 import net.minecraft.client.gui.screens.advancements.AdvancementWidgetType;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
@@ -20,7 +21,7 @@ import net.minecraft.util.Mth;
 import javax.annotation.Nullable;
 import java.util.*;
 
-public final class CriteriaTooltip {
+public class CriteriaTooltip {
     // Background texture for the tooltip body
     private static final ResourceLocation TITLE_BOX =
             ResourceLocation.withDefaultNamespace("advancements/title_box");
@@ -33,15 +34,14 @@ public final class CriteriaTooltip {
     private static final ResourceLocation BOX_UNOBTAINED =
             ResourceLocation.withDefaultNamespace("textures/gui/sprites/advancements/box_unobtained.png");
 
-    private CriteriaTooltip() {}
-
     // Stores the textures and width needed to draw the progress bar
     private record ProgressStyle(
             AdvancementWidgetType completedType,
             AdvancementWidgetType remainingType,
             AdvancementWidgetType frameType,
             int completedWidth
-    ) {}
+    ) {
+    }
 
     // Returns a list of criteria that will be displayed in the tooltip
     public static List<FormattedCharSequence> criteriaList(
@@ -75,11 +75,18 @@ public final class CriteriaTooltip {
         for (String name : names) {
             CriterionProgress criterion = progress.getCriterion(name);
             boolean complete = criterion != null && criterion.isDone();
+            MutableComponent icon;
 
             // If the criterion is complete, show a green tick, otherwise show a red cross
-            Component icon = Component.literal(complete ? "✔ " : "✘ ")
-                    .withStyle(complete ? ChatFormatting.GREEN : ChatFormatting.RED)
-                    .append(Component.literal(formatCriteria(name)).withStyle(ChatFormatting.GRAY));
+            if (complete) {
+                icon = Component.literal("✔ ")
+                        .withStyle(ChatFormatting.GREEN);
+            } else {
+                icon = Component.literal("✘ ")
+                        .withStyle(ChatFormatting.RED);
+            }
+
+            icon = icon.append(Component.literal(formatCriteria(name)).withStyle(ChatFormatting.GRAY));
             list.add(Language.getInstance().getVisualOrder(icon));
         }
 
@@ -352,7 +359,7 @@ public final class CriteriaTooltip {
             percent = progress.getPercent();
         }
 
-        int completedWidth = Mth.floor(percent * (float)width);
+        int completedWidth = Mth.floor(percent * (float) width);
 
         // Use the obtained style when the advancement is complete
         if (percent >= 1.0F) {
