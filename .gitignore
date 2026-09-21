@@ -1,8 +1,10 @@
+### Gradle ###
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/**/build/
 
+### IntelliJ IDEA ###
 .idea/
 *.iws
 *.iml
@@ -12,6 +14,7 @@ out/
 
 .run/
 
+### Eclipse ###
 .apt_generated
 .classpath
 .eclipse/
@@ -23,11 +26,16 @@ out/
 bin/
 !**/src/**/bin/
 
+### VS Code ###
 .vscode/
 
+### Mac OS ###
 .DS_Store
 
+### Minecraft Modding ###
 run/
+fabric/runs/
+neoforge/runs/
 !**/src/**/run/
 **/src/generated/**/.cache/
 repo/

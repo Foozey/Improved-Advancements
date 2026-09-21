@@ -1,0 +1,55 @@
+plugins {
+    id 'java-library'
+}
+
+base {
+    archivesName = "${mod_id}-${project.name}-${minecraft_version}"
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(java_version)
+}
+
+tasks.withType(Jar).configureEach {
+    from(rootProject.file('LICENSE')) {
+        rename { "${it}_${mod_name}" }
+    }
+}
+
+version = mod_version
+
+processResources {
+    var expandProps = [
+            'group'                        : project.group,
+            'java_version'                 : java_version,
+            'mod_id'                       : mod_id,
+            'mod_name'                     : mod_name,
+            'mod_author'                   : mod_author,
+            'mod_description'              : mod_description,
+            'mod_version'                  : mod_version,
+            'mod_license'                  : mod_license,
+            'mod_homepage'                 : mod_homepage,
+            'mod_source'                   : mod_source,
+            'mod_issues'                   : mod_issues,
+            'minecraft_version'            : minecraft_version,
+            'minecraft_version_range'      : minecraft_version_range,
+            'fabric_version'               : fabric_version,
+            'fabric_loader_version'        : fabric_loader_version,
+            'neoforge_version'             : neoforge_version,
+            'neoforge_loader_version_range': neoforge_loader_version_range
+    ]
+
+    var jsonExpandProps = expandProps.collectEntries {
+        key, value -> [(key): value instanceof String ? value.replace('\n', '\\\\n') : value]
+    }
+
+    filesMatching(['META-INF/mods.toml', 'META-INF/neoforge.mods.toml']) {
+        expand expandProps
+    }
+
+    filesMatching(['pack.mcmeta', 'fabric.mod.json', '*.mixins.json']) {
+        expand jsonExpandProps
+    }
+
+    inputs.properties(expandProps)
+}
